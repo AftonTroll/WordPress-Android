@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -230,7 +231,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
+        Log.w("AFTON","ON CONFIG CHANGED");
         if (getView() != null) {
             // Reload the format bar to make sure the correct one for the new screen width is being used
             View formatBar = getView().findViewById(R.id.format_bar);
@@ -293,6 +294,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
     }
 
     private void setupFormatBarButtonMap(View view) {
+        Log.w("AFTON","SETUP FORMAT BAR BUTTON MAP");
         ToggleButton boldButton = (ToggleButton) view.findViewById(R.id.format_bar_button_bold);
         mTagToggleButtonMap.put(getString(R.string.format_bar_tag_bold), boldButton);
 
@@ -331,6 +333,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
     }
 
     protected void initJsEditor() {
+        Log.w("AFTON","INIT JS EDITOR");
         if(!isAdded()) {
             return;
         }
@@ -350,6 +353,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
 
     @Override
     public void onClick(View v) {
+        Log.w("AFTON","ONCLICK VIEW V");
         int id = v.getId();
         if (id == R.id.format_bar_button_html) {
             // Don't switch to HTML mode if currently uploading media
@@ -448,6 +452,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
 
     @Override
     public boolean onTouch(View view, MotionEvent event) {
+        Log.w("AFTON","ON TOUCH");
         if (event.getAction() == MotionEvent.ACTION_UP) {
             // If the WebView or EditText has received a touch event, the keyboard will be displayed and the action bar
             // should hide
@@ -462,12 +467,14 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
      */
     @Override
     public void onImeBack() {
+        Log.w("AFTON","ON IME BACK");
         mIsKeyboardOpen = false;
         showActionBarIfNeeded();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.w("AFTON","ON ACTIVITY RESULT");
         super.onActivityResult(requestCode, resultCode, data);
 
         if ((requestCode == LinkDialogFragment.LINK_DIALOG_REQUEST_CODE_ADD ||
@@ -519,6 +526,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
                         Utils.escapeHtml(linkText) + "');");
             }
         } else if (requestCode == ImageSettingsDialogFragment.IMAGE_SETTINGS_DIALOG_REQUEST_CODE) {
+            Log.w("AFTON", "ACTIVITY RESULT IMAGE SETTINGS DIALOG");
             if (data == null) {
                 return;
             }
@@ -549,6 +557,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.w("AFTON","ON CREATE OPTIONS");
         menu.add(0, BUTTON_ID_LOG_HTML, 0, "Log HTML")
                 .setIcon(R.drawable.ic_log_html)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -557,6 +566,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.w("AFTON","OPTIONS ITEM SELECTED");
         if (item.getItemId() == BUTTON_ID_LOG_HTML) {
             if (mDebugModeEnabled) {
                 // Log the raw html
@@ -577,11 +587,13 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
 
     @Override
     public void setTitle(CharSequence text) {
+        Log.w("AFTON","SET TITLE");
         mTitle = text.toString();
     }
 
     @Override
     public void setContent(CharSequence text) {
+        Log.w("AFTON","SET CONTENT");
         mContentHtml = text.toString();
     }
 
@@ -591,6 +603,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
      */
     @Override
     public CharSequence getTitle() {
+        Log.w("AFTON","GET TITLE");
         if (!isAdded()) {
             return "";
         }
@@ -630,6 +643,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
      */
     @Override
     public CharSequence getContent() {
+        Log.w("AFTON","GET CONTENT");
         if (!isAdded()) {
             return "";
         }
@@ -665,6 +679,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
 
     @Override
     public void appendMediaFile(final MediaFile mediaFile, final String mediaUrl, ImageLoader imageLoader) {
+        Log.w("AFTON", "SHOULD APPEND");
         mWebView.post(new Runnable() {
             @Override
             public void run() {
@@ -676,6 +691,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
                     mWebView.execJavaScriptFromString("ZSSEditor.setProgressOnImage(" + id + ", " + 0 + ");");
                     mUploadingMediaIds.add(id);
                 }
+                Log.w("AFTON", "APPENDING MEDIA FILE");
             }
         });
     }
@@ -692,11 +708,13 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
 
     @Override
     public void setTitlePlaceholder(CharSequence placeholderText) {
+        Log.w("AFTON","TITLE PLACEHOLDER");
         mTitlePlaceholder = placeholderText.toString();
     }
 
     @Override
     public void setContentPlaceholder(CharSequence placeholderText) {
+        Log.w("AFTON","CONTENT PLACEHOLDER");
         mContentPlaceholder = placeholderText.toString();
     }
 
@@ -705,6 +723,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
         mWebView.post(new Runnable() {
             @Override
             public void run() {
+                Log.w("AFTON","MEDIA UPLOAD SUCCEED");
                 mWebView.execJavaScriptFromString("ZSSEditor.replaceLocalImageWithRemoteImage(" + mediaId + ", '" +
                         remoteUrl + "');");
                 mUploadingMediaIds.remove(mediaId);
@@ -717,6 +736,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
         mWebView.post(new Runnable() {
             @Override
             public void run() {
+                Log.w("AFTON","MEDIA UPLOAD PROGRESS");
                 String progressString = String.format("%.1f", progress);
                 mWebView.execJavaScriptFromString("ZSSEditor.setProgressOnImage(" + mediaId + ", " +
                         progressString + ");");
@@ -729,6 +749,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
         mWebView.post(new Runnable() {
             @Override
             public void run() {
+                Log.w("AFTON","MEDIA UPLOAD FAIL");
                 mWebView.execJavaScriptFromString("ZSSEditor.markImageUploadFailed(" + mediaId + ");");
                 mUploadingMediaIds.remove(mediaId);
             }
@@ -738,6 +759,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
     public void onDomLoaded() {
         mWebView.post(new Runnable() {
             public void run() {
+                Log.w("AFTON","DOM LOADED");
                 mWebView.execJavaScriptFromString("ZSSEditor.getField('zss_field_content').setMultiline('true');");
 
                 // Set title and content placeholder text
@@ -763,6 +785,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
     public void onSelectionStyleChanged(final Map<String, Boolean> changeMap) {
         mWebView.post(new Runnable() {
             public void run() {
+                Log.w("AFTON", "SELECTION STYLE CHANGED");
                 for (Map.Entry<String, Boolean> entry : changeMap.entrySet()) {
                     // Handle toggling format bar style buttons
                     ToggleButton button = mTagToggleButtonMap.get(entry.getKey());
@@ -779,6 +802,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
         mWebView.post(new Runnable() {
             @Override
             public void run() {
+                Log.w("AFTON","SELECTION CHANGED");
                 if (!focusedFieldId.isEmpty()) {
                     switch (focusedFieldId) {
                         case "zss_field_title":
@@ -794,6 +818,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
     }
 
     public void onMediaTapped(final String mediaId, String url, final String meta, String uploadStatus) {
+        Log.w("AFTON", "ON MEDIA FUCKING TAPPED");
         switch (uploadStatus) {
             case "uploading":
                 // Display 'cancel upload' dialog
@@ -838,6 +863,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
                 break;
             default:
                 // Show media options fragment
+                Log.w("AFTON", "SHOW MEDIA OPTIONS FRAGMENT");
                 FragmentManager fragmentManager = getFragmentManager();
 
                 if (fragmentManager.findFragmentByTag(ImageSettingsDialogFragment.IMAGE_SETTINGS_DIALOG_TAG) != null) {
@@ -867,6 +893,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
     }
 
     public void onLinkTapped(String url, String title) {
+        Log.w("AFTON","LINK TAPPED");
         LinkDialogFragment linkDialogFragment = new LinkDialogFragment();
         linkDialogFragment.setTargetFragment(this, LinkDialogFragment.LINK_DIALOG_REQUEST_CODE_UPDATE);
 
@@ -881,7 +908,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
 
     public void onGetHtmlResponse(Map<String, String> inputArgs) {
         String functionId = inputArgs.get("function");
-
+        Log.w("AFTON","GET HTML RESPONSE");
         if (functionId.isEmpty()) {
             return;
         }
@@ -911,6 +938,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
     }
 
     private void updateVisualEditorFields() {
+        Log.w("AFTON","UPDATE VISUAL EDITOR FIELDS");
         mWebView.execJavaScriptFromString("ZSSEditor.getField('zss_field_title').setPlainText('" +
                 Utils.escapeHtml(mTitle) + "');");
         mWebView.execJavaScriptFromString("ZSSEditor.getField('zss_field_content').setHTML('" +
@@ -956,6 +984,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
     }
 
     void updateFormatBarEnabledState(boolean enabled) {
+        Log.w("AFTON","UPDATE FORMAT BAR ENABLE STATE");
         float alpha = (enabled ? TOOLBAR_ALPHA_ENABLED : TOOLBAR_ALPHA_DISABLED);
         for(ToggleButton button : mTagToggleButtonMap.values()) {
             button.setEnabled(enabled);
@@ -964,6 +993,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
     }
 
     private void clearFormatBarButtons() {
+        Log.w("AFTON","CLEAR FORMAT BAR BUTTONS");
         for (ToggleButton button : mTagToggleButtonMap.values()) {
             if (button != null) {
                 button.setChecked(false);
@@ -972,6 +1002,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
     }
 
     private void onFormattingButtonClicked(ToggleButton toggleButton) {
+        Log.w("AFTON","ON FORMATTING BUTTON CLICKED");
         String tag = toggleButton.getTag().toString();
 
         if (mWebView.getVisibility() == View.VISIBLE) {
@@ -987,6 +1018,7 @@ public class EditorFragment extends EditorFragmentAbstract implements View.OnCli
      * @param tag identifier tag
      */
     private void applyFormattingHtmlMode(ToggleButton toggleButton, String tag) {
+        Log.w("AFTON","APPLY FORMATTING HTML MODE");
         if (mSourceViewContent == null) {
             return;
         }

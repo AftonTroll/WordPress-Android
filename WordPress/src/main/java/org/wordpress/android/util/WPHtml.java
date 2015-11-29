@@ -45,6 +45,7 @@ import android.text.style.SuperscriptSpan;
 import android.text.style.TextAppearanceSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.URLSpan;
+import android.util.Log;
 
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;
@@ -424,6 +425,7 @@ public class WPHtml {
                         xRes, yRes, url, mimeType, url);
             }
         } else {
+            Log.w("AFTON", "ALIGNMENT");
             String alignment = "";
             switch (mediaFile.getHorizontalAlignment()) {
             case 0:
@@ -545,6 +547,7 @@ class HtmlToSpannedConverter implements ContentHandler {
     }
 
     public Spanned convert() {
+        Log.w("AFTON", "CONVERT");
         mReader.setContentHandler(this);
         try {
             mReader.parse(new InputSource(new StringReader(mSource)));

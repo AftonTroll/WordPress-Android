@@ -3,6 +3,7 @@ package org.wordpress.android.widgets;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -108,6 +109,7 @@ public class PostListButton extends LinearLayout {
     }
 
     public static int getButtonIconResId(int buttonType) {
+        Log.w("AFTON", "GET ICON ID");
         switch (buttonType) {
             case BUTTON_EDIT:
                 return R.drawable.noticon_edit;

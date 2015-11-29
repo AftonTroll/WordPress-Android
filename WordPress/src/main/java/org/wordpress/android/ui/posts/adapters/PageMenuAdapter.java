@@ -2,6 +2,7 @@ package org.wordpress.android.ui.posts.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ public class PageMenuAdapter extends BaseAdapter {
 
     public PageMenuAdapter(Context context, @NonNull PostsListPost page) {
         super();
+        Log.w("AFTON", "PAGE MENU ADAPTER");
         mInflater = LayoutInflater.from(context);
 
         boolean showViewItem = !page.isLocalDraft() && page.getStatusEnum() == PostStatus.PUBLISHED;

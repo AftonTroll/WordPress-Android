@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ public class EditPostPreviewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.w("AFTON","CREATE EDIT POST PREVIEW FRAGMENT");
         mActivity = (EditPostActivity)getActivity();
 
         ViewGroup rootView = (ViewGroup) inflater
@@ -36,6 +38,7 @@ public class EditPostPreviewFragment extends Fragment {
         mTextView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
+                Log.w("AFTON","ON GLOBAL LAYOUT");
                 if (mActivity != null) {
                     loadPost();
                 }
@@ -76,15 +79,17 @@ public class EditPostPreviewFragment extends Fragment {
     private class LoadPostPreviewTask extends AsyncTask<Void, Void, Spanned> {
         @Override
         protected Spanned doInBackground(Void... params) {
+            Log.w("AFTON", "LOAD POST PREVIEW TASK");
             Spanned contentSpannable;
 
             if (mActivity == null || mActivity.getPost() == null) {
+                Log.w("AFTON", "ACTIVITY OR POST NULL");
                 return null;
             }
 
             Post post = mActivity.getPost();
 
-            String postTitle = "<h1>" + post.getTitle() + "</h1>";
+            String postTitle = "<h1>" +"AFTON "+ post.getTitle() + "</h1>";
             String postContent = postTitle + post.getDescription() + "\n\n" + post.getMoreText();
 
             if (post.isLocalDraft()) {
@@ -105,6 +110,7 @@ public class EditPostPreviewFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Spanned spanned) {
+            Log.w("AFTON", "POST EXECUTE PREVIEW TASK");
             if (mActivity != null && mActivity.getPost() != null && spanned != null) {
                 if (mActivity.getPost().isLocalDraft()) {
                     mTextView.setVisibility(View.VISIBLE);

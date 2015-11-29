@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -52,6 +53,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.w("AFTON", "DIALOG FRAGMENT CREATED");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
@@ -112,6 +114,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.w("AFTON", "DIALOG FRAGMENT CREATED VIEW");
         View view = inflater.inflate(R.layout.dialog_image_options, container, false);
 
         ImageView thumbnailImage = (ImageView) view.findViewById(R.id.image_thumbnail);
@@ -166,6 +169,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
+        Log.w("AFTON", "DIALOG FRAGMENT ON CONFIG CHANGE");
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             actionBar.show();
@@ -174,6 +178,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.w("AFTON", "DIALOG FRAGMENT ON CREATE OPTION MENU");
         if (menu != null) {
             menu.clear();
         }
@@ -181,6 +186,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.w("AFTON", "DIALOG FRAGMENT ON OPTIONS ITEM SELECTED");
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
@@ -192,6 +198,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
     }
 
     private ActionBar getActionBar() {
+        Log.w("AFTON", "DIALOG FRAGMENT GET ACTION BAR");
         if (!isAdded()) {
             return null;
         }
@@ -204,6 +211,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
     }
 
     private void restorePreviousActionBar() {
+        Log.w("AFTON", "DIALOG FRAGMENT RESTORE PREVIOUS BAR");
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             actionBar.setTitle(mPreviousActionBarTitle);
@@ -218,6 +226,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
     }
 
     private void loadThumbnail(final String src, final ImageView thumbnailImage) {
+        Log.w("AFTON", "DIALOG FRAGMENT LOAD THUMBNAIL");
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -241,6 +250,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
      * Initialize the image width SeekBar and accompanying EditText
      */
     private void setupWidthSeekBar(final SeekBar widthSeekBar, final EditText widthText, int imageWidth) {
+        Log.w("AFTON", "DIALOG FRAGMENT SETUP SEEK BAR");
         widthSeekBar.setMax(mMaxImageWidth / 10);
 
         if (imageWidth != 0) {
@@ -269,6 +279,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
         widthText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
+                Log.w("AFTON", "DIALOG FRAGMENT SET ON FOCUS CHANGE LISTENER");
                 if (hasFocus) {
                     widthText.setText("");
                 }
@@ -278,6 +289,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
         widthText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                Log.w("AFTON", "DIALOG FRAGMENT SET ON ACTION LISTENER");
                 int width = getEditTextIntegerClamped(widthText, 10, mMaxImageWidth);
                 widthSeekBar.setProgress(width / 10);
                 widthText.setSelection((String.valueOf(width).length()));
@@ -300,6 +312,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
      * @return
      */
     public static int getMaximumImageWidth(int naturalImageWidth, String imageWidthBlogSettingString) {
+        Log.w("AFTON", "DIALOG FRAGMENT GET MAX WIDTH");
         int imageWidthBlogSetting = Integer.MAX_VALUE;
 
         if (!imageWidthBlogSettingString.equals("Original Size")) {
@@ -325,6 +338,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
      * 'px' units
      */
     private int getEditTextIntegerClamped(EditText editText, int minWidth, int maxWidth) {
+        Log.w("AFTON", "DIALOG FRAGMENT GET INTEGER CLAMPED");
         int width = 10;
 
         try {
@@ -343,6 +357,7 @@ public class ImageSettingsDialogFragment extends DialogFragment {
      * Given the new width, return the proportionally adjusted height, given the dimensions of the original image
      */
     private int getRelativeHeightFromWidth(int width) {
+        Log.w("AFTON", "DIALOG FRAGMENT GET RELATIVE HEIGHT");
         int height = 0;
 
         try {

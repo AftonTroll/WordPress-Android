@@ -3,6 +3,7 @@ package org.wordpress.android.ui.reader;
 import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Handler;
+import android.util.Log;
 
 import org.wordpress.android.R;
 import org.wordpress.android.WordPress;
@@ -65,6 +66,7 @@ class ReaderPostRenderer {
     }
 
     void beginRender() {
+        Log.w("AFTON", "BEGIN RENDER!");
         final Handler handler = new Handler();
         mRenderBuilder = new StringBuilder(getPostContent());
 

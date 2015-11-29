@@ -29,6 +29,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.CharacterStyle;
 import android.text.style.SuggestionSpan;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -787,6 +788,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
     }
 
     private MediaFile createMediaFile(String blogId, final String mediaId) {
+        Log.w("AFTON", "CREATE MEDIA FILE");
         Cursor cursor = WordPress.wpDB.getMediaFile(blogId, mediaId);
 
         if (cursor == null || !cursor.moveToFirst()) {
@@ -825,6 +827,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
     }
 
     private void addExistingMediaToEditor(String mediaId) {
+        Log.w("AFTON","ADD MEDIA TO EDITOR");
         if (WordPress.getCurrentBlog() == null) {
             return;
         }
@@ -1113,6 +1116,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
      */
 
     private void fetchMedia(Uri mediaUri) {
+        Log.w("AFTON","FETCH MEDIA");
         if (URLUtil.isNetworkUrl(mediaUri.toString())) {
             // Create an AsyncTask to download the file
             new DownloadMediaTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mediaUri);
@@ -1148,6 +1152,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
     }
 
     private void updateMediaFileOnServer(WPImageSpan wpIS) {
+        Log.w("AFTON","UPDATE MEDIA ON SERVER");
         Blog currentBlog = WordPress.getCurrentBlog();
         if (currentBlog == null || wpIS == null)
             return;
@@ -1180,16 +1185,20 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
         List<Object> apiArgs = new ArrayList<Object>();
         apiArgs.add(currentBlog);
         task.execute(apiArgs);
+		Log.w("AFTON", "UPDATE MEDIA FILE ON SERVER");
     }
 
     private boolean addMedia(Uri imageUri) {
+        Log.w("AFTON","ADD MEDIA");
         if (imageUri != null && !MediaUtils.isInMediaStore(imageUri) && !imageUri.toString().startsWith("/")) {
             imageUri = MediaUtils.downloadExternalMedia(this, imageUri);
         }
 
         if (imageUri == null) {
+            Log.w("AFTON","NULL");
             return false;
         }
+        Log.w("AFTON","NOT NULL");
 
         String mediaTitle;
         if (MediaUtils.isVideo(imageUri.toString())) {
@@ -1207,7 +1216,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
         }
         WordPress.wpDB.saveMediaFile(mediaFile);
         mEditorFragment.appendMediaFile(mediaFile, mediaFile.getFilePath(), WordPress.imageLoader);
-
+        Log.w("AFTON", "ADD MEDIA DONE");
         return true;
     }
 
@@ -1296,12 +1305,14 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
     }
 
     private void startMediaGalleryAddActivity() {
+        Log.w("AFTON","START MEDIA GALLERY ADD ACTIITY");
         Intent intent = new Intent(this, MediaGalleryPickerActivity.class);
         intent.putExtra(MediaGalleryPickerActivity.PARAM_SELECT_ONE_ITEM, true);
         startActivityForResult(intent, MediaGalleryPickerActivity.REQUEST_CODE);
     }
 
     private void handleMediaGalleryPickerResult(Intent data) {
+        Log.w("AFTON","HANDLE MEDIA GALLERY PICKER RESULT");
         ArrayList<String> ids = data.getStringArrayListExtra(MediaGalleryPickerActivity.RESULT_IDS);
         if (ids == null || ids.size() == 0) {
             return;
@@ -1312,6 +1323,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
     }
 
     private void handleMediaGalleryResult(Intent data) {
+        Log.w("AFTON","HANDLE MEDIA GALLERY RESULT");
         MediaGallery gallery = (MediaGallery) data.getSerializableExtra(MediaGalleryActivity.RESULT_MEDIA_GALLERY);
 
         // if blank gallery returned, don't add to span
@@ -1330,6 +1342,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
      *  {@link org.wordpress.android.ui.media.MediaPickerActivity#SELECTED_CONTENT_RESULTS_KEY}
      */
     private void handleGalleryResult(Intent data) {
+        Log.w("AFTON","HANDLE GALLERY RESULT");
         if (data != null) {
             List<MediaItem> selectedContent = data.getParcelableArrayListExtra(MediaPickerActivity.SELECTED_CONTENT_RESULTS_KEY);
 
@@ -1395,6 +1408,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
      *  result {@link android.content.Intent} with selected media items
      */
     private void handleMediaSelectionResult(Intent data) {
+        Log.w("AFTON","HANDLE MEDIA SELECTION RESULT");
         if (data != null) {
             final List<MediaItem> selectedContent =
                     data.getParcelableArrayListExtra(MediaPickerActivity.SELECTED_CONTENT_RESULTS_KEY);
@@ -1442,6 +1456,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
      *  list containing all sources to gather image media from
      */
     private ArrayList<MediaSource> imageMediaSelectionSources() {
+        Log.w("AFTON","IMAGE MEDIA SELECTION SOURCES");
         ArrayList<MediaSource> imageMediaSources = new ArrayList<>();
         imageMediaSources.add(new MediaSourceDeviceImages());
 
@@ -1449,6 +1464,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
     }
 
     private ArrayList<MediaSource> blogImageMediaSelectionSources() {
+        Log.w("AFTON","BLOG IMAGE MEDIA SELECTION SOURCES");
         ArrayList<MediaSource> imageMediaSources = new ArrayList<>();
         imageMediaSources.add(new MediaSourceWPImages());
 
@@ -1456,6 +1472,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
     }
 
     private ArrayList<MediaSource> blogVideoMediaSelectionSources() {
+        Log.w("AFTON","BLOG VIDEO MEDIA SELECTION SOURCES");
         ArrayList<MediaSource> imageMediaSources = new ArrayList<>();
         imageMediaSources.add(new MediaSourceWPVideos());
 
@@ -1469,6 +1486,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
      *  list containing all sources to gather video media from
      */
     private ArrayList<MediaSource> videoMediaSelectionSources() {
+        Log.w("AFTON","VIDEO MEDIA SELECTION SOURCES");
         ArrayList<MediaSource> videoMediaSources = new ArrayList<>();
         videoMediaSources.add(new MediaSourceDeviceVideos());
 
@@ -1540,6 +1558,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
      * Starts {@link org.wordpress.android.ui.media.MediaPickerActivity} after refreshing the blog media.
      */
     private void startMediaSelection() {
+        Log.w("AFTON","START MEDIA SELECTION");
         Intent intent = new Intent(this, MediaPickerActivity.class);
         intent.putExtra(MediaPickerActivity.ACTIVITY_TITLE_KEY, getString(R.string.add_to_post));
         intent.putParcelableArrayListExtra(MediaPickerActivity.DEVICE_IMAGE_MEDIA_SOURCES_KEY,
@@ -1558,6 +1577,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
     }
 
     private void refreshBlogMedia() {
+        Log.w("AFTON","REFRESH MEDIA");
         if (NetworkUtils.isNetworkAvailable(this)) {
             List<Object> apiArgs = new ArrayList<Object>();
             apiArgs.add(WordPress.getCurrentBlog());
@@ -1665,6 +1685,7 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
 
     @Override
     public void onSettingsClicked() {
+        Log.w("AFTON","ON SETTINGS CLICKED");
         mViewPager.setCurrentItem(PAGE_SETTINGS);
     }
 
@@ -1685,11 +1706,13 @@ public class EditPostActivity extends AppCompatActivity implements EditorFragmen
 
     @Override
     public void onEditorFragmentInitialized() {
+        Log.w("AFTON","EDITOR FRAGMENT INIT");
         fillContentEditorFields();
     }
 
     @Override
     public void saveMediaFile(MediaFile mediaFile) {
+        Log.w("AFTON","SAVE MEDIA");
         WordPress.wpDB.saveMediaFile(mediaFile);
     }
 }

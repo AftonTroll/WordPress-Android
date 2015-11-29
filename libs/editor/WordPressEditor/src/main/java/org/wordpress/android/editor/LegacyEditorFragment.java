@@ -28,6 +28,7 @@ import android.text.style.QuoteSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -96,7 +97,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
     private LinearLayout mFormatBar, mPostContentLinearLayout, mPostSettingsLinearLayout;
     private Button mAddPictureButton;
     private boolean mIsBackspace;
-    private boolean mScrollDetected;
+    public boolean mScrollDetected;
     private boolean mIsLocalDraft;
 
     private int mStyleStart, mSelectionStart, mSelectionEnd, mFullViewBottom;
@@ -118,6 +119,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
 
     @Override
     public CharSequence getTitle() {
+        Log.w("AFTON", "LEGACY GET TITLE");
         if (mTitleEditText != null) {
             return mTitleEditText.getText().toString();
         }
@@ -126,6 +128,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
 
     @Override
     public CharSequence getContent() {
+        Log.w("AFTON", "LEGACY GET CONTENT");
         if (mContentEditText != null) {
             return mContentEditText.getText().toString();
         }
@@ -134,6 +137,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
 
     @Override
     public void setTitle(CharSequence text) {
+        Log.w("AFTON", "LEGACY SET TITLE");
         mTitle = text;
         if (mTitleEditText != null) {
             mTitleEditText.setText(text);
@@ -164,6 +168,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.w("AFTON", "LEGACY CREATE VIEW");
         final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_edit_post_content, container, false);
 
         mFormatBar = (LinearLayout) rootView.findViewById(R.id.format_bar);
@@ -250,6 +255,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        Log.w("AFTON", "LEGACY VIEW CREATED");
         super.onViewCreated(view, savedInstanceState);
         mRootView = view;
         mRootView.getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
@@ -257,12 +263,14 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
 
     private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
         public void onGlobalLayout() {
+            Log.w("AFTON", "LEGACY GLOBAL LISTENER");
             mRootView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
             mFullViewBottom = mRootView.getBottom();
         }
     };
 
     private ActionBar getActionBar() {
+        Log.w("AFTON", "LEGACY get action bar");
         if (!isAdded()) {
             return null;
         }
@@ -274,6 +282,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
     }
 
     public void setContentEditingModeVisible(boolean isVisible) {
+        Log.w("AFTON", "LEGACY set editing visible");
         if (!isAdded()) {
             return;
         }
@@ -331,6 +340,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.w("AFTON", "LEGACY on result create link");
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == LegacyEditorFragment.ACTIVITY_REQUEST_CODE_CREATE_LINK && data != null) {
@@ -355,6 +365,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
     }
 
     private void createLinkFromSelection(String linkURL, String linkText) {
+        Log.w("AFTON", "LEGACY create link from selection");
         try {
             if (linkURL != null && !linkURL.equals("http://") && !linkURL.equals("")) {
                 if (mSelectionStart > mSelectionEnd) {
@@ -413,6 +424,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
     private View.OnClickListener mFormatBarButtonClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            Log.w("AFTON", "LEGACY on click listener");
             int id = v.getId();
             if (id == R.id.bold) {
                 AnalyticsTracker.track(Stat.EDITOR_TAPPED_BOLD);
@@ -467,10 +479,23 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
     };
 
     private WPEditImageSpan createWPEditImageSpanLocal(Context context, MediaFile mediaFile) {
+        Log.w("AFTON", "Legacy create WPEdit image span");
         Uri imageUri = Uri.parse(mediaFile.getFilePath());
-        Bitmap thumbnailBitmap;
+        Bitmap thumbnailBitmap = null;
+
         if (MediaUtils.isVideo(imageUri.toString())) {
-            thumbnailBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.media_movieclip);
+            //Log.w("AFTON", "Media file path: " + mediaFile.getFilePath());
+            //Log.w("AFTON", "Media uri: " + imageUri);
+            //Log.w("AFTON", "THUMB URL: " + mediaFile.getThumbnailURL());
+            //Log.w("AFTON", "PARSED THUMB URL: " + Uri.parse(mediaFile.getThumbnailURL()));
+
+            //Uri videoThumbnailUri = Uri.parse(mediaFile.getThumbnailURL());
+            thumbnailBitmap = ImageUtils.getWPImageSpanThumbnailFromFilePath(context, imageUri.getEncodedPath(),
+                    ImageUtils.getMaximumThumbnailWidthForEditor(context));
+            if (thumbnailBitmap == null) {
+                Log.w("AFTON", "NULL");
+                thumbnailBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.media_movieclip);
+            }
         } else {
             thumbnailBitmap = ImageUtils.getWPImageSpanThumbnailFromFilePath(context, imageUri.getEncodedPath(),
                     ImageUtils.getMaximumThumbnailWidthForEditor(context));
@@ -486,6 +511,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
     }
 
     private WPEditImageSpan createWPEditImageSpanRemote(Context context, MediaFile mediaFile) {
+        Log.w("AFTON", "LEGACY create WPEDit Image remote");
         int drawable = mediaFile.isVideo() ? R.drawable.media_movieclip : R.drawable.legacy_dashicon_format_image_big_grey;
         Uri uri = Uri.parse(mediaFile.getFileURL());
         WPEditImageSpan imageSpan = new WPEditImageSpan(context, drawable, uri);
@@ -494,6 +520,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
     }
 
     private WPEditImageSpan createWPEditImageSpan(Context context, MediaFile mediaFile) {
+        Log.w("AFTON", "LEGACY create WPEdit again");
         if (!URLUtil.isNetworkUrl(mediaFile.getFileURL())) {
             return createWPEditImageSpanLocal(context, mediaFile);
         } else {
@@ -508,6 +535,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
      * @param tag HTML tag name for text style
      */
     private void onFormatButtonClick(ToggleButton toggleButton, String tag) {
+        Log.w("AFTON", "LEGACY on format button click");
         Spannable s = mContentEditText.getText();
         if (s == null)
             return;
@@ -598,63 +626,11 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
         }
     }
 
-    /**
-     * Rich Text Editor
-     */
-    public void showImageSettings(final View alertView, final EditText titleText,
-                                  final EditText caption, final EditText imageWidthText,
-                                  final CheckBox featuredCheckBox, final CheckBox featuredInPostCheckBox,
-                                  final int maxWidth, final Spinner alignmentSpinner, final WPImageSpan imageSpan) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(getString(R.string.image_settings));
-        builder.setView(alertView);
-        builder.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String title = (titleText.getText() != null) ? titleText.getText().toString() : "";
-                MediaFile mediaFile = imageSpan.getMediaFile();
-                if (mediaFile == null) {
-                    return;
-                }
-                mediaFile.setTitle(title);
-                mediaFile.setHorizontalAlignment(alignmentSpinner.getSelectedItemPosition());
-                mediaFile.setWidth(getEditTextIntegerClamped(imageWidthText, 10, maxWidth));
-                String captionText = (caption.getText() != null) ? caption.getText().toString() : "";
-                mediaFile.setCaption(captionText);
-                mediaFile.setFeatured(featuredCheckBox.isChecked());
-                if (featuredCheckBox.isChecked()) {
-                    // remove featured flag from all other images
-                    Spannable contentSpannable = mContentEditText.getText();
-                    WPImageSpan[] imageSpans =
-                            contentSpannable.getSpans(0, contentSpannable.length(), WPImageSpan.class);
-                    if (imageSpans.length > 1) {
-                        for (WPImageSpan postImageSpan : imageSpans) {
-                            if (postImageSpan != imageSpan) {
-                                MediaFile postMediaFile = postImageSpan.getMediaFile();
-                                postMediaFile.setFeatured(false);
-                                postMediaFile.setFeaturedInPost(false);
-                                // TODO: remove this
-                                mEditorFragmentListener.saveMediaFile(postMediaFile);
-                            }
-                        }
-                    }
-                }
-                mediaFile.setFeaturedInPost(featuredInPostCheckBox.isChecked());
-                // TODO: remove this
-                mEditorFragmentListener.saveMediaFile(mediaFile);
-            }
-        });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog alertDialog = builder.create();
-        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        alertDialog.show();
-    }
+
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        Log.w("AFTON", "LEGACY ON TOUCH");
         float pos = event.getY();
 
         if (event.getAction() == 0)
@@ -700,111 +676,10 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
                     if (mediaFile == null)
                         return false;
                     if (!mediaFile.isVideo()) {
-                        LayoutInflater factory = LayoutInflater.from(getActivity());
-                        final View alertView = factory.inflate(R.layout.alert_image_options, null);
-                        if (alertView == null)
-                            return false;
-                        final EditText imageWidthText = (EditText) alertView.findViewById(R.id.imageWidthText);
-                        final EditText titleText = (EditText) alertView.findViewById(R.id.title);
-                        final EditText caption = (EditText) alertView.findViewById(R.id.caption);
-                        final CheckBox featuredCheckBox = (CheckBox) alertView.findViewById(R.id.featuredImage);
-                        final CheckBox featuredInPostCheckBox = (CheckBox) alertView.findViewById(R.id.featuredInPost);
-
-                        // show featured image checkboxes if supported
-                        if (mFeaturedImageSupported) {
-                            featuredCheckBox.setVisibility(View.VISIBLE);
-                            featuredInPostCheckBox.setVisibility(View.VISIBLE);
-                        }
-
-                        featuredCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                            @Override
-                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                if (isChecked) {
-                                    featuredInPostCheckBox.setVisibility(View.VISIBLE);
-                                } else {
-                                    featuredInPostCheckBox.setVisibility(View.GONE);
-                                }
-
-                            }
-                        });
-
-                        final SeekBar seekBar = (SeekBar) alertView.findViewById(R.id.imageWidth);
-                        final Spinner alignmentSpinner = (Spinner) alertView.findViewById(R.id.alignment_spinner);
-                        ArrayAdapter<CharSequence> adapter =
-                                ArrayAdapter.createFromResource(getActivity(), R.array.alignment_array,
-                                        android.R.layout.simple_spinner_item);
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        alignmentSpinner.setAdapter(adapter);
-
-                        imageWidthText.setText(String.valueOf(mediaFile.getWidth()) + "px");
-                        seekBar.setProgress(mediaFile.getWidth());
-                        titleText.setText(mediaFile.getTitle());
-                        caption.setText(mediaFile.getCaption());
-                        featuredCheckBox.setChecked(mediaFile.isFeatured());
-
-                        if (mediaFile.isFeatured()) {
-                            featuredInPostCheckBox.setVisibility(View.VISIBLE);
-                        } else {
-                            featuredInPostCheckBox.setVisibility(View.GONE);
-                        }
-
-                        featuredInPostCheckBox.setChecked(mediaFile.isFeaturedInPost());
-
-                        alignmentSpinner.setSelection(mediaFile.getHorizontalAlignment(), true);
-
-                        final int maxWidth = MediaUtils.getMinimumImageWidth(getActivity(),
-                                imageSpan.getImageSource(), mBlogSettingMaxImageWidth);
-                        seekBar.setMax(maxWidth / 10);
-                        if (mediaFile.getWidth() != 0) {
-                            seekBar.setProgress(mediaFile.getWidth() / 10);
-                        }
-                        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                            @Override
-                            public void onStopTrackingTouch(SeekBar seekBar) {
-                            }
-
-                            @Override
-                            public void onStartTrackingTouch(SeekBar seekBar) {
-                            }
-
-                            @Override
-                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                if (progress == 0) {
-                                    progress = 1;
-                                }
-                                imageWidthText.setText(progress * 10 + "px");
-                            }
-                        });
-
-                        imageWidthText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                            @Override
-                            public void onFocusChange(View v, boolean hasFocus) {
-                                if (hasFocus) {
-                                    imageWidthText.setText("");
-                                }
-                            }
-                        });
-
-                        imageWidthText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                            @Override
-                            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                                int width = getEditTextIntegerClamped(imageWidthText, 10, maxWidth);
-                                seekBar.setProgress(width / 10);
-                                imageWidthText.setSelection((String.valueOf(width).length()));
-
-                                InputMethodManager imm = (InputMethodManager) getActivity()
-                                        .getSystemService(Context.INPUT_METHOD_SERVICE);
-                                imm.hideSoftInputFromWindow(imageWidthText.getWindowToken(),
-                                        InputMethodManager.RESULT_UNCHANGED_SHOWN);
-
-                                return true;
-                            }
-                        });
-
-                        showImageSettings(alertView, titleText, caption, imageWidthText, featuredCheckBox,
-                                featuredInPostCheckBox, maxWidth, alignmentSpinner, imageSpan);
-                        mScrollDetected = false;
-                        return true;
+                        return LegacySettingsHelper.inflateImage(mediaFile, imageSpan, this, mContentEditText);
+                    } else {
+                        Log.w("AFTON", "TOUCH A VIDEO!!!");
+                        return LegacySettingsHelper.inflateVideo(mediaFile, imageSpan, this, mContentEditText);
                     }
 
                 } else {
@@ -831,6 +706,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
 
     @Override
     public void afterTextChanged(Editable s) {
+        Log.w("AFTON", "Legacy after text changed");
         int position = Selection.getSelectionStart(mContentEditText.getText());
         if ((mIsBackspace && position != 1) || mLastPosition == position || !mIsLocalDraft)
             return;
@@ -882,6 +758,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
 
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        Log.w("AFTON", "Legacy before text changed");
         mIsBackspace = (count - after == 1) || (s.length() == 0);
     }
 
@@ -891,6 +768,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
 
     @Override
     public void onSelectionChanged() {
+        Log.w("AFTON", "Legacy on selection changed");
         if (!mIsLocalDraft) {
             return;
         }
@@ -929,7 +807,8 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
         }
     }
 
-    private int getEditTextIntegerClamped(EditText editText, int min, int max) {
+    public int getEditTextIntegerClamped(EditText editText, int min, int max) {
+        Log.w("AFTON", "Legacy edit text integer clamp");
         int width = 10;
         try {
             if (editText.getText() != null)
@@ -942,6 +821,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
     }
 
     private void loadWPImageSpanThumbnail(MediaFile mediaFile, String imageURL, ImageLoader imageLoader) {
+        Log.w("AFTON", "Lecay load image thumbnail");
         if (mediaFile == null || imageURL == null) {
             return;
         }
@@ -1026,6 +906,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
     }
 
     public void addMediaFile(final MediaFile mediaFile, final String imageUrl, final ImageLoader imageLoader, final int start, final int end) {
+        Log.w("AFTON", "Legacy add media file");
         mediaFile.setFileURL(imageUrl);
         mediaFile.setFilePath(imageUrl);
         final WPEditImageSpan imageSpan = createWPEditImageSpan(getActivity(), mediaFile);
@@ -1089,11 +970,13 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
 
     @Override
     public void appendMediaFile(final MediaFile mediaFile, final String imageUrl, final ImageLoader imageLoader) {
+        Log.w("AFTON", "Legacy append media file");
         addMediaFile(mediaFile, imageUrl, imageLoader, mContentEditText.getSelectionStart(), mContentEditText.getSelectionEnd());
     }
 
     @Override
     public void appendGallery(MediaGallery mediaGallery) {
+        Log.w("AFTON", "Append gallery");
         Editable editableText = mContentEditText.getText();
         if (editableText == null) {
             return;
