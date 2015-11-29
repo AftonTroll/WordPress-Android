@@ -15,6 +15,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.ExifInterface;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -337,8 +338,11 @@ public class ImageUtils {
             // Load the video thumbnail from the MediaStore
             int videoId = 0;
             try {
+                Log.w("AFTON", "FILE PATH: " + filePath);
+                Log.w("AFTON", "CUR URI: " + curUri.getLastPathSegment());
                 videoId = Integer.parseInt(curUri.getLastPathSegment());
             } catch (NumberFormatException e) {
+                Log.w("AFTON", "NUMBER FORMAT EXCEPTION, ID WILL BE WRONG");
             }
             ContentResolver crThumb = context.getContentResolver();
             BitmapFactory.Options options = new BitmapFactory.Options();
@@ -346,9 +350,20 @@ public class ImageUtils {
             Bitmap videoThumbnail = MediaStore.Video.Thumbnails.getThumbnail(crThumb, videoId, MediaStore.Video.Thumbnails.MINI_KIND,
                     options);
             if (videoThumbnail != null) {
+                Log.w("AFTON", "FOUND THUMBNAIL");
                 return getScaledBitmapAtLongestSide(videoThumbnail, targetWidth);
             } else {
-                return null;
+                Log.w("AFTON", "NO THUMBNAIL");
+                Log.w("AFTON", "TRYING TO FIND THUMBNAIL IN SOME OTHER WAY");
+                videoThumbnail = ThumbnailUtils.createVideoThumbnail(filePath, MediaStore.Video.Thumbnails.MINI_KIND);
+                if (videoThumbnail != null) {
+                    Log.w("AFTON", "ACTUALLY FOUND SOMETHING AGAIN");
+                    return getScaledBitmapAtLongestSide(videoThumbnail, targetWidth);
+                } else {
+                    Log.w("AFTON", "NULL AGAIN");
+                    return null;
+                }
+
             }
         } else {
             // Create resized bitmap

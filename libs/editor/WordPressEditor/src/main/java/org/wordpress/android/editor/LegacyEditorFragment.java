@@ -7,6 +7,10 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -495,6 +499,20 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
             if (thumbnailBitmap == null) {
                 Log.w("AFTON", "NULL");
                 thumbnailBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.media_movieclip);
+            } else {
+                //Add the nice movie clip in the corner with a black background so it's visible
+                Bitmap clip = BitmapFactory.decodeResource(context.getResources(), R.drawable.media_movieclip);
+                clip = Bitmap.createScaledBitmap(clip, clip.getWidth()/2, clip.getHeight()/2, false);
+                Bitmap combined = Bitmap.createBitmap(thumbnailBitmap.getWidth(), thumbnailBitmap.getHeight(), thumbnailBitmap.getConfig());
+                Canvas c = new Canvas(combined);
+                c.drawBitmap(thumbnailBitmap, new Matrix(), null);
+                int x = thumbnailBitmap.getWidth() - clip.getWidth();
+                int y = thumbnailBitmap.getHeight() - clip.getHeight();
+                Paint p = new Paint();
+                p.setColor(Color.BLACK);
+                c.drawRect((float)x,(float)y, (float)thumbnailBitmap.getWidth(), (float)thumbnailBitmap.getHeight(), p);
+                c.drawBitmap(clip, x, y, null);
+                thumbnailBitmap = combined;
             }
         } else {
             thumbnailBitmap = ImageUtils.getWPImageSpanThumbnailFromFilePath(context, imageUri.getEncodedPath(),
