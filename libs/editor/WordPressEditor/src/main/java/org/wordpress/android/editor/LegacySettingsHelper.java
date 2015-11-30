@@ -18,6 +18,7 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
 import org.wordpress.android.util.MediaUtils;
 import org.wordpress.android.util.helpers.MediaFile;
 import org.wordpress.android.util.helpers.WPImageSpan;
@@ -199,9 +200,8 @@ public class LegacySettingsHelper {
 // VIDEO
 //=====================================================================
     public static void showVideoSettings(final View alertView, final EditText titleText,
-                                         final EditText caption, final EditText imageWidthText,
-                                         final CheckBox featuredCheckBox, final CheckBox featuredInPostCheckBox,
-                                         final int maxWidth, final Spinner alignmentSpinner, final WPImageSpan imageSpan,
+                                         final EditText caption,
+                                         final CheckBox featuredCheckBox, final CheckBox featuredInPostCheckBox, final Spinner alignmentSpinner, final WPImageSpan imageSpan,
                                          final LegacyEditorFragment fragment, final EditText mContentEditText) {
         Log.w("AFTON", "LEGACY show image settings");
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
@@ -216,7 +216,6 @@ public class LegacySettingsHelper {
                 }
                 mediaFile.setTitle(title);
                 mediaFile.setHorizontalAlignment(alignmentSpinner.getSelectedItemPosition());
-                mediaFile.setWidth(fragment.getEditTextIntegerClamped(imageWidthText, 10, maxWidth));
                 String captionText = (caption.getText() != null) ? caption.getText().toString() : "";
                 mediaFile.setCaption(captionText);
                 mediaFile.setFeatured(featuredCheckBox.isChecked());
@@ -258,11 +257,15 @@ public class LegacySettingsHelper {
         final View alertView = factory.inflate(R.layout.alert_image_options, null);
         if (alertView == null)
             return false;
-        final EditText imageWidthText = (EditText) alertView.findViewById(R.id.imageWidthText);
         final EditText titleText = (EditText) alertView.findViewById(R.id.title);
         final EditText caption = (EditText) alertView.findViewById(R.id.caption);
         final CheckBox featuredCheckBox = (CheckBox) alertView.findViewById(R.id.featuredImage);
         final CheckBox featuredInPostCheckBox = (CheckBox) alertView.findViewById(R.id.featuredInPost);
+        final TextView widthText = (TextView) alertView.findViewById(R.id.image_width_header);
+        final SeekBar seekBar = (SeekBar) alertView.findViewById(R.id.imageWidth);
+
+        seekBar.setVisibility(View.GONE);
+        widthText.setVisibility(View.GONE);
 
         // show featured image checkboxes if supported
         if (fragment.mFeaturedImageSupported) {
@@ -282,7 +285,6 @@ public class LegacySettingsHelper {
             }
         });
 
-        final SeekBar seekBar = (SeekBar) alertView.findViewById(R.id.imageWidth);
         final Spinner alignmentSpinner = (Spinner) alertView.findViewById(R.id.alignment_spinner);
         ArrayAdapter<CharSequence> adapter =
                 ArrayAdapter.createFromResource(fragment.getActivity(), R.array.alignment_array,
@@ -290,8 +292,6 @@ public class LegacySettingsHelper {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         alignmentSpinner.setAdapter(adapter);
 
-        imageWidthText.setText(String.valueOf(mediaFile.getWidth()) + "px");
-        seekBar.setProgress(mediaFile.getWidth());
         titleText.setText(mediaFile.getTitle());
         caption.setText(mediaFile.getCaption());
         featuredCheckBox.setChecked(mediaFile.isFeatured());
@@ -306,58 +306,8 @@ public class LegacySettingsHelper {
 
         alignmentSpinner.setSelection(mediaFile.getHorizontalAlignment(), true);
 
-        final int maxWidth = MediaUtils.getMinimumImageWidth(fragment.getActivity(),
-                imageSpan.getImageSource(), fragment.mBlogSettingMaxImageWidth);
-        seekBar.setMax(maxWidth / 10);
-        if (mediaFile.getWidth() != 0) {
-            seekBar.setProgress(mediaFile.getWidth() / 10);
-        }
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (progress == 0) {
-                    progress = 1;
-                }
-                imageWidthText.setText(progress * 10 + "px");
-            }
-        });
-
-        imageWidthText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    imageWidthText.setText("");
-                }
-            }
-        });
-
-        imageWidthText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                int width = fragment.getEditTextIntegerClamped(imageWidthText, 10, maxWidth);
-                seekBar.setProgress(width / 10);
-                imageWidthText.setSelection((String.valueOf(width).length()));
-
-                InputMethodManager imm = (InputMethodManager) fragment.getActivity()
-                        .getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(imageWidthText.getWindowToken(),
-                        InputMethodManager.RESULT_UNCHANGED_SHOWN);
-
-                return true;
-            }
-        });
-
-        LegacySettingsHelper.showVideoSettings(alertView, titleText, caption, imageWidthText, featuredCheckBox,
-                featuredInPostCheckBox, maxWidth, alignmentSpinner, imageSpan,
-                fragment, mContentEditText);
+        LegacySettingsHelper.showVideoSettings(alertView, titleText, caption, featuredCheckBox,
+                featuredInPostCheckBox, alignmentSpinner, imageSpan, fragment, mContentEditText);
         fragment.mScrollDetected = false;
         return true;
     }

@@ -41,6 +41,7 @@
             android:prompt="@string/image_alignment"/>
 
         <TextView
+            android:id="@+id/image_width_header"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/width"
@@ -50,7 +51,8 @@
         <SeekBar
             android:layout_height="wrap_content"
             android:id="@+id/imageWidth"
-            android:layout_width="match_parent"/>
+            android:layout_width="match_parent"
+            android:indeterminate="false" />
 
         <EditText
             android:layout_width="fill_parent"
